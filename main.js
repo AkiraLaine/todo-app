@@ -2,15 +2,14 @@ $(function() {
     function delete_item() {
         var $item = $(this);
         $item = $item.parents(".item");
-        var title = $item.find(".item-left").text();
-        remove_item(title);
-        console.log(title);
+        remove_item($item.find(".item-left").text());
         $item.remove();
     }
     
     var todo_items = [];
+    var hasStorage = typeof window.localStorage !== "undefined";
     function preload() {
-        if (typeof window.localStorage !== "undefined") {
+        if (hasStorage) {
             var items = localStorage.getItem("items");
             if (items && items.length > 0) {
                 var items = JSON.parse(items);
@@ -24,13 +23,13 @@ $(function() {
         }
     }
     function save_item(item) {
-        if (typeof window.localStorage !== "undefined") {
+        if (hasStorage) {
             todo_items.push(item);
             localStorage.setItem("items", JSON.stringify(todo_items));
         }
     }
     function remove_item(item) {
-        if (typeof window.localStorage !== "undefined") {
+        if (hasStorage) {
             var loc = todo_items.indexOf(item);
             if (loc >= 0) {
                 todo_items.splice(loc, 1);
