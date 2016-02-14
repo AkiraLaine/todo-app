@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Cube Game</title>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var canvas = document.createElement("canvas");
+            var ctx = canvas.getContext("2d");
+            canvas.width = 600;
+            canvas.height = 400;
+            canvas.style.border = "5px solid grey";
+            document.body.appendChild(canvas);
+            
+            var x = canvas.width/2;
+            var y = canvas.height/2;
+            var xv = 0;
+            var yv = 0;
+            var gravity = 0.01;
+            var damping = 0.99;
+            var width = 100;
+            var height = 40;
+            
+            function init() {
+                ctx.fillStyle = "black";
+            }
+            function control() {
+                if(y > canvas.height - height) {
+                    yv = -Math.abs(yv);
+                }
+                
+                y += yv;
+                yv += gravity;
+                x += xv;
+                yv *= damping;
+            }
+            function render() {
+                ctx.fillRect(x, y, width, height);
+            }
+            function control() {
+                init();
+                function loop() {
+                    control();
+                    render();
+                    window.requestAnimationFrame(loop);
+                }
+                window.requestAnimationFrame(loop);
+            }
+            control();
+        </script>
+    </body>
+</html>
