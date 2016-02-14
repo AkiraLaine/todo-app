@@ -16,9 +16,14 @@ h2 {
 .item-left {
     float: left;
 }
+
 .item-right {
     float: right;
 }
+.item-right a {
+    display: inline-block;
+}
+
 .clearfix {
     clear: both;
 }

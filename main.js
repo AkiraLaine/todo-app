@@ -8,19 +8,28 @@ $(function() {
     
     var todo_items = [];
     var hasStorage = typeof window.localStorage !== "undefined";
+    function find_item(title) {
+        return todo_items.map(item => item.valueL).indexOf(title.toLowerCase());
+    }
     function preload() {
         if (hasStorage) {
             var items = localStorage.getItem("items");
             if (items && items.length > 0) {
                 var items = JSON.parse(items);
                 for (var i = 0; i < items.length; i++) {
-                    todo_items.push(items[i]);
-                    add_item(items[i], true);
+                    add_item(items[i].value, items[i]);
                 }
             } else {
                 localStorage.setItem("items", JSON.stringify(todo_items));
             }
         }
+    }
+    function create_item(title, completed) {
+        return {
+            value: title,
+            valueL: title.toLowerCase(),
+            completed: completed || false
+        };
     }
     function save_item(item) {
         if (hasStorage) {
@@ -28,9 +37,9 @@ $(function() {
             localStorage.setItem("items", JSON.stringify(todo_items));
         }
     }
-    function remove_item(item) {
+    function remove_item(title) {
         if (hasStorage) {
-            var loc = todo_items.indexOf(item);
+            var loc = find_item(title);
             if (loc >= 0) {
                 todo_items.splice(loc, 1);
                 localStorage.setItem("items", JSON.stringify(todo_items));
@@ -39,21 +48,21 @@ $(function() {
     }
     
     var $items = $("#items");
-    var $amount = $("#amt");
     var item_temp = $("#item-temp").html();
-    function add_item(title,once) {
+    function add_item(title,obj) {
+        if (find_item(title) > -1) { return; }
+        obj = obj || create_item(title, false);
         var item = item_temp.replace("{{ title }}", title);
         var $item = $(item);
         $item.find(".btn-delete").on("click", delete_item);
         $items.append($item);
-        if (once != true) {
-            save_item(title);
-        }
+        save_item(obj);
     }
     preload();
     
     var $input = $("#input");
     var $inputBtn = $("#input-btn");
+    
     function handle_input() {
         var text = $input.val().trim();
         $input.val("");
@@ -62,6 +71,7 @@ $(function() {
         }
         $input.focus();
     }
+    
     $inputBtn.on('click', handle_input);
     $input.on("keypress", function(e){
         if(e.which == 13) {
@@ -69,4 +79,5 @@ $(function() {
             return false;
         }
     });
+    
 });
