@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<title>Todo List App</title>
+	
+	<meta charset="UTF-8" />
+	
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+	<div class="container-fluid">
+		<h1>Todo List</h1>
+		<hr /> 
+		<div class="container">
+			<div class="input-group" style="margin-bottom: 15px;">
+				<input class="form-control" type="text" placeholder="Enter Your Item"  onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter Your Item'"  value="" id="input"/>
+				<span class="input-group-btn">
+					<button type="button" class="btn btn-success" type="button" id="input-btn">Submit</button>
+				</span>
+			</div>
+			<template id="item-temp">
+				<div class="alert alert-warning item">
+					<div class="item-left">{{ title }}</div>
+					<div class="item-right">
+						<a class="btn-sub" href="#"><span class="glyphicon glyphicon-plus" style="color: green"></span></a>
+						<a class="btn-delete" href="#"><span class="glyphicon glyphicon-remove" style="color: red"></span></a>
+					</div>
+					<div class="clearfix"></div>
+				</div>
+			</template>
+			<div id="items"></div>
+		</div>
+	</div>
+	<script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" language="javascript" src="main.js"></script>   
+</body>
+</html>
