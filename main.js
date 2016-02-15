@@ -1,83 +1,116 @@
+/*
+ * Authors: noob247365, AkiraLaine
+ * Contributors: joshuagollaher
+ * Date Modified: 2016/02/14
+ * File: main.js
+ * Description: Handling the DOM interaction
+ */
+
+// Execute on document.ready
 $(function() {
-    function delete_item() {
-        var $item = $(this);
-        $item = $item.parents(".item");
-        remove_item($item.find(".item-left").text());
-        $item.remove();
-    }
-    
-    var todo_items = [];
-    var hasStorage = typeof window.localStorage !== "undefined";
-    function find_item(title) {
-        return todo_items.map(item => item.valueL).indexOf(title.toLowerCase());
-    }
-    function preload() {
-        if (hasStorage) {
-            var items = localStorage.getItem("items");
-            if (items && items.length > 0) {
-                var items = JSON.parse(items);
-                for (var i = 0; i < items.length; i++) {
-                    add_item(items[i].value, items[i]);
-                }
-            } else {
-                localStorage.setItem("items", JSON.stringify(todo_items));
-            }
-        }
-    }
-    function create_item(title, completed) {
-        return {
-            value: title,
-            valueL: title.toLowerCase(),
-            completed: completed || false
-        };
-    }
-    function save_item(item) {
-        if (hasStorage) {
-            todo_items.push(item);
-            localStorage.setItem("items", JSON.stringify(todo_items));
-        }
-    }
-    function remove_item(title) {
-        if (hasStorage) {
-            var loc = find_item(title);
-            if (loc >= 0) {
-                todo_items.splice(loc, 1);
-                localStorage.setItem("items", JSON.stringify(todo_items));
-            }
-        }
-    }
-    
-    var $items = $("#items");
-    var item_temp = $("#item-temp").html();
-    function add_item(title,obj) {
-        if (find_item(title) > -1) { return; }
-        obj = obj || create_item(title, false);
-        var item = item_temp.replace("{{ title }}", title);
-        var $item = $(item);
-        $item.find(".btn-delete").on("click", delete_item);
-        $items.append($item);
-        save_item(obj);
-    }
-    preload();
-    
-    var $input = $("#input");
-    var $inputBtn = $("#input-btn");
-    
-    function handle_input() {
-        var text = $input.val().trim();
-        $input.val("");
-        if (text.length > 0) {
-            add_item(text);
-        }
-        $input.focus();
-    }
-    
-    $inputBtn.on('click', handle_input);
-    $input.on("keypress", function(e){
-        if(e.which == 13) {
-            handle_input();
-            return false;
-        }
-    });
-    
+	// Create the todo list object
+	var todo_list = new TodoList(cb_create_item);
+
+	// Key for localStorage
+	var storage_key = "todo_list";
+
+	// DOM cache
+	var $items = $("#items");
+	var item_template = $("#item-temp").html();
+	var $input = $("#input");
+	var $inputBtn = $("#input-btn");
+
+	// CALLBACK: Create item, given an item object
+	function cb_create_item(obj) {
+		// Create a new jQuery handlable node from data
+		var $item = $(item_template.replace("{{ title }}", obj.value));
+
+		// Add the uuid data attribute
+		$item.data("uuid", obj.uuid);
+
+		// Add the event listener for deletion
+		$item.find(".btn-delete").on("click", h_delete_item);
+
+		// Append to items holder
+		$items.append($item);
+	}
+
+	// HANDLER: Delete the item
+	function h_delete_item() {
+		// Grab the whole item
+		var $item = $(this).parents(".item");
+
+		// Delete from the todo list based on uuid
+		try {
+			// Get the uuid
+			var uuid = parseInt($item.data("uuid"));
+
+			// Remove from the todo list
+			todo_list.remove_item(uuid);
+		}
+
+		// Error, delete based on title
+		catch(e) {
+			// Get the title
+			var title = $item.find(".item-left").text();
+
+			// Remove from the todo list
+			todo_list.remove_item(title);
+		}
+
+		// Save the new list
+		todo_list.save_storage(storage_key);
+
+		// Remove from the DOM
+		$item.remove();
+	}
+
+	// Add an item to the todo list (will call the create_item callback)
+	function add_item(title) {
+		// Add to the todo list
+		todo_list.add_item(title);
+
+		// Save the new list
+		todo_list.save_storage(storage_key);
+	}
+
+	// HANDLER: Try to add based on input
+	function h_add_item() {
+		// Get the input
+		var text = $input.val().trim();
+
+		// Clear input
+		$input.val("");
+
+		// Only allow non-empty input
+		if (text.length > 0) {
+			// Add the item
+			add_item(text);
+		}
+
+		// Focus on input
+		$input.focus();
+	}
+
+	// Add input handler to input button
+	$inputBtn.on("click", h_add_item);
+
+	// Allow for enter-to-submit on input field
+	$input.on("keypress", function(e) {
+		// When pressing enter
+		if (e.which == 13) {
+			// Handle input
+			h_add_item();
+
+			// Prevent default
+			e.preventDefault();
+			return false;
+		}
+	});
+
+	// Load from storage
+	if (!(todo_list.load_storage(storage_key))) {
+		// Save default todo list
+		todo_list.save_storage(storage_key);
+	}
 });
