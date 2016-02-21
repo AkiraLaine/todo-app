@@ -15,6 +15,7 @@ $(function() {
 	var storage_key = "todo_list";
 
 	// DOM cache
+	var $item = $(".item");
 	var $items = $("#items");
 	var item_template = $("#item-temp").html();
 	var $input = $("#input");
@@ -31,8 +32,40 @@ $(function() {
 		// Add the event listener for deletion
 		$item.find(".btn-delete").on("click", h_delete_item);
 
+		if(obj.completed){
+			$item.children(".item-left").addClass("completed");
+		}
+
 		// Append to items holder
 		$items.append($item);
+
+		$(".item-left").on("click", function(e){
+			e.stopImmediatePropagation()
+			if(!$(this).hasClass("completed")){
+				$(this).addClass("completed");
+				var uuid = parseInt($item.data("uuid"));
+				todo_list.update_status(uuid, true);
+				todo_list.save_storage(storage_key);
+			} else {
+				$(this).removeClass("completed");
+				var uuid = parseInt($item.data("uuid"));
+				todo_list.update_status(uuid, false);
+				todo_list.save_storage(storage_key);
+			}
+		});
+
+		$(".btn-sub").on("click", function(){
+			$(".sub-group").hide();
+			$(this).parent().siblings(".sub-group").show();
+		})
+
+		$(".sub-input-btn").on("click", function(e){
+			e.stopImmediatePropagation()
+			var subItem = "<li>" + $(this).parent().siblings("#sub-input").val() + "</li>";
+			$(this).parents(".item").children("#hidden-tasks").append(subItem);
+			$(this).parent().siblings("#sub-input").val("");
+			$("#hidden-tasks").show();
+		})
 	}
 
 	// HANDLER: Delete the item

@@ -18,6 +18,7 @@ h1, input {
 
 .item-left {
     float: left;
+    cursor: pointer;
 }
 
 .item-right {
@@ -29,4 +30,12 @@ h1, input {
 
 .clearfix {
     clear: both;
+}
+
+.completed{
+    text-decoration: line-through;
+}
+
+.show{
+    display: visible;
 }
